@@ -17,7 +17,7 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }).then(tabs =>
        f(entry.responseEnd - entry.responseStart),
        f(entry.domContentLoadedEventEnd - entry.domContentLoadedEventStart),
        f(entry.domComplete - entry.domInteractive)
-      ]
+      ];
     }
   }, results => {
     let u = document.getElementsByTagName("u");
