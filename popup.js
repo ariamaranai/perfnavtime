@@ -21,8 +21,10 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }).then(tabs =>
       ];
     }
   }, results => {
-    let u = document.getElementsByTagName("u");
-    let i = 10;
-    while (u[--i].textContent = results[0].result[i], i);
+    if (results) {
+      let u = document.getElementsByTagName("u");
+      let i = 10;
+      while (u[--i].textContent = results[0].result[i], i);
+    }
   })
 );
