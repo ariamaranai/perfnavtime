@@ -1,4 +1,4 @@
-chrome.tabs.query({ active: !0, currentWindow: !0 }).then(tabs =>
+chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs =>
   tabs[0].url[0] != "c" && chrome.scripting.executeScript({
     target: { tabId: tabs[0].id },
     world: "MAIN",
@@ -22,7 +22,7 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }).then(tabs =>
     }
   }, results => {
     if (results) {
-      let u = document.getElementsByTagName("u");
+      let u = document.body.children;
       let i = 10;
       while (u[--i].textContent = results[0].result[i], i);
     }
