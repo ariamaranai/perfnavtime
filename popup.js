@@ -3,7 +3,6 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs => {
   let url = t.url;
   url[0] != "c" && chrome.scripting.executeScript({
     target: { tabId: t.id },
-    world: "MAIN",
     func: () => {
       let {
         nextHopProtocol,
