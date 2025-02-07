@@ -39,11 +39,7 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs => {
       if (results[4] == "100%") {
         let response = await fetch (url);
         if (response.status == 200) {
-          results[5] = 0;
-          let reader = (await (await response.body).pipeThrough(new CompressionStream("gzip"))).getReader();
-          let chunk;
-          while (!(chunk = await reader.read()).done)
-            results[5] += chunk.value.length;
+          results[5] = (await (new Response(response.body.pipeThrough(new CompressionStream("gzip")))).bytes()).length;
           results[6] = (results[5] / results[2] * 100).toFixed(1) + "%";
           results[5] = results[5].toString();
         }
