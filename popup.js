@@ -1,7 +1,7 @@
-chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs => {
+chrome.tabs.query({ active: !0, currentWindow: !0 }, async tabs => {
   let t = tabs[0];
   let url = t.url;
-  url[0] != "c" && chrome.scripting.executeScript({
+  let results = url[0] != "c" && await chrome.scripting.executeScript({
     target: { tabId: t.id },
     func: () => {
       let {
@@ -34,28 +34,27 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs => {
         (domComplete - domInteractive).toFixed(1) + "ms"
       ];
     }
-  }, async results => {
-    if (results &&= results[0].result) {
-      let encodedBodySize = results[2];
-      let compressionRatio = results[4];
-      if (compressionRatio == "100%") {
-        let response = await fetch (url);
-        if (response.status == 200) {
-          let bytes = results[5] = (await (
-            new Response(response.body.pipeThrough(new CompressionStream("gzip")))
-          ).bytes()).length;
-          results[6] = (bytes / encodedBodySize * 100).toFixed(1) + "%";
-          results[5] = bytes + "";
-        }
-      }
-      results[2] = encodedBodySize + "";
-      let maxLength = Math.max(results[1].length, results[3].length, compressionRatio.length, results[7].length);
-      let u = document.body.children;
-      let i = 12;
-      while (
-        u[--i].textContent = (t = results[i]) ? t.padStart(maxLength, " ") : "", 
-        i
-      );
-    }
   });
+  if (results &&= results[0].result) {
+    let encodedBodySize = results[2];
+    let compressionRatio = results[4];
+    if (compressionRatio == "100%") {
+      let response = await fetch (url);
+      if (response.status == 200) {
+        let bytes = results[5] = (await (
+          new Response(response.body.pipeThrough(new CompressionStream("gzip")))
+        ).bytes()).length;
+        results[6] = (bytes / encodedBodySize * 100).toFixed(1) + "%";
+        results[5] = bytes + "";
+      }
+    }
+    results[2] = encodedBodySize + "";
+    let maxLength = Math.max(results[1].length, results[3].length, compressionRatio.length, results[7].length);
+    let u = document.body.children;
+    let i = 12;
+    while (
+      u[--i].textContent = (t = results[i]) ? t.padStart(maxLength, " ") : "", 
+      i
+    );
+  }
 });
