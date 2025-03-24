@@ -32,25 +32,29 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs =>
         (domComplete - domInteractive).toFixed(1) + "ms"
       ];
     }
-  }).then(async results => {
+  }).then(results => {
     let result = results[0].result;
     let encodedBodySize = result[2];
     let n = result[4];
-    if (n == "100%") {
-      let response = await fetch (tabs[0].url);
-      if (response.status == 200) {
-        let bytes = result[5] = (await (new Response(response.body.pipeThrough(new CompressionStream("gzip")))).bytes()).length;
-        result[6] = (bytes / encodedBodySize * 100).toFixed(1) + "%";
-        result[5] = bytes + "";
-      }
+    let f = () => {
+      let maxLength = Math.max(result[1].length, result[3].length, n.length, result[7].length);
+      let u = document.body.children;
+      let i = 12;
+      while (
+        u[--i].textContent = (n = result[i]) ? n.padStart(maxLength, " ") : "",
+        i
+      );
     }
     result[2] = encodedBodySize + "";
-    let maxLength = Math.max(result[1].length, result[3].length, n.length, result[7].length);
-    let u = document.body.children;
-    let i = 12;
-    while (
-      u[--i].textContent = (n = result[i]) ? n.padStart(maxLength, " ") : "",
-      i
-    );
+    n == "100%"
+      ? fetch (tabs[0].url)
+          .then(r => (new Response(r.body.pipeThrough(new CompressionStream("gzip")))).bytes())
+            .then(r => {
+              let bytes = r.length;
+              result[6] = (bytes / encodedBodySize * 100).toFixed(1) + "%";
+              result[5] = bytes + "";
+              f();
+            }).catch(() => 0)
+      : f();
   }).catch(() => 0)
 );
