@@ -1,37 +1,39 @@
 chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs =>
-  chrome.scripting.executeScript({
+  chrome.userScripts.execute({
     target: { tabId: tabs[0].id },
-    func: () => {
-      let {
-        nextHopProtocol,
-        deliveryType,
-        encodedBodySize,
-        decodedBodySize,
-        duration,
-        requestStart,
-        secureConnectionStart,
-        responseEnd,
-        responseStart,
-        domContentLoadedEventEnd,
-        domContentLoadedEventStart,
-        domComplete,
-        domInteractive
-      } = performance.getEntriesByType("navigation")[0];
-      return [
-        nextHopProtocol,
-        deliveryType,
-        encodedBodySize,
-        decodedBodySize + "",
-        encodedBodySize == decodedBodySize ? "100%" : (encodedBodySize / decodedBodySize * 100).toFixed(1) + "%",
-        0,
-        0,
-        duration.toFixed(1) + "ms",
-        (requestStart - secureConnectionStart).toFixed(1) + "ms",
-        (responseEnd - responseStart).toFixed(1) + "ms",
-        (domContentLoadedEventEnd - domContentLoadedEventStart).toFixed(1) + "ms",
-        (domComplete - domInteractive).toFixed(1) + "ms"
-      ];
-    }
+    js: [{ code:
+`(() => {
+  let {
+    nextHopProtocol,
+    deliveryType,
+    encodedBodySize,
+    decodedBodySize,
+    duration,
+    requestStart,
+    secureConnectionStart,
+    responseEnd,
+    responseStart,
+    domContentLoadedEventEnd,
+    domContentLoadedEventStart,
+    domComplete,
+    domInteractive
+  } = performance.getEntriesByType("navigation")[0];
+  return [
+    nextHopProtocol,
+    deliveryType,
+    encodedBodySize,
+    decodedBodySize + "",
+    encodedBodySize == decodedBodySize ? "100%" : (encodedBodySize / decodedBodySize * 100).toFixed(1) + "%",
+    0,
+    0,
+    duration.toFixed(1) + "ms",
+    (requestStart - secureConnectionStart).toFixed(1) + "ms",
+    (responseEnd - responseStart).toFixed(1) + "ms",
+    (domContentLoadedEventEnd - domContentLoadedEventStart).toFixed(1) + "ms",
+    (domComplete - domInteractive).toFixed(1) + "ms"
+  ];
+})();`
+    }]
   }).then(results => {
     let result = results[0].result;
     let encodedBodySize = result[2];
