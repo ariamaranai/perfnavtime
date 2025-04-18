@@ -51,12 +51,11 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs =>
     n == "100%"
       ? fetch (tabs[0].url)
           .then(r => (new Response(r.body.pipeThrough(new CompressionStream("gzip")))).bytes())
-            .then(r => {
-              let bytes = r.length;
-              result[6] = (bytes / encodedBodySize * 100).toFixed(1) + "%";
-              result[5] = bytes + "";
-              f();
-            }).catch(() => 0)
+            .then(({ length }) => (
+              result[6] = (length / encodedBodySize * 100).toFixed(1) + "%",
+              result[5] = length + "",
+              f()
+            )).catch(() => 0)
       : f();
   }).catch(() => 0)
 );
