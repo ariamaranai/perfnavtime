@@ -23,20 +23,20 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs =>
   let gzippedSize = "";
   let gzippedRatio = "";
   let compressionRatio = "";
-
-  let r;
+  
   try {
-    r = await fetch (location.href);
+    let r = await fetch (location.href);
+    encodedBodySize == decodedBodySize
+      ? (
+        compressionRatio = "100 %",
+        gzippedRatio = ((gzippedSize = (await (new Response(r.body.pipeThrough(new CompressionStream("gzip")))).bytes()).length) / encodedBodySize * 100).toFixed(1) + " %",
+        gzippedSize = gzippedSize.toLocaleString("en-US") + " bytes"
+      )
+      : (
+        compressionRatio = (encodedBodySize / decodedBodySize * 100).toFixed(1) + " %",
+        contentEncoding = r.headers.get("content-encoding")
+      );
   } catch (e) {}
-
-  if (encodedBodySize == decodedBodySize) {
-    compressionRatio = "100 %";
-    gzippedRatio = ((gzippedSize = (await (new Response(r.body.pipeThrough(new CompressionStream("gzip")))).bytes()).length) / encodedBodySize * 100).toFixed(1) + " %";
-    gzippedSize = gzippedSize.toLocaleString("en-US") + " bytes";
-  } else (
-    compressionRatio = (encodedBodySize / decodedBodySize * 100).toFixed(1) + " %",
-    contentEncoding = r.headers.get("content-encoding")
-  )
 
   return nextHopProtocol + "\\n" +
     deliveryType + "\\n" +
