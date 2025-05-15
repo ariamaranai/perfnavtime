@@ -2,7 +2,7 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs =>
   chrome.userScripts.execute({
     target: { tabId: tabs[0].id },
     js: [{ code:
-`(() => {
+`(async () => {
   let {
     nextHopProtocol,
     deliveryType,
@@ -18,44 +18,35 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs =>
     domComplete,
     domInteractive
   } = performance.getEntriesByType("navigation")[0];
-  return [
-    nextHopProtocol,
-    deliveryType,
-    encodedBodySize,
-    decodedBodySize + "",
-    encodedBodySize == decodedBodySize ? "100%" : (encodedBodySize / decodedBodySize * 100).toFixed(1) + "%",
-    0,
-    0,
-    duration.toFixed(1) + "ms",
-    (requestStart - secureConnectionStart).toFixed(1) + "ms",
-    (responseEnd - responseStart).toFixed(1) + "ms",
-    (domContentLoadedEventEnd - domContentLoadedEventStart).toFixed(1) + "ms",
-    (domComplete - domInteractive).toFixed(1) + "ms"
-  ];
+
+  let gzippedSize = "";
+  let gzippedRatio = "";
+  let compressionRatio = "";
+  if (encodedBodySize == decodedBodySize) {
+    compressionRatio = "100%";
+    try {
+      gzippedSize = (await (new Response((await fetch (location.href)).body.pipeThrough(new CompressionStream("gzip"))).bytes())).length;
+    } catch (e) {}
+    gzippedRatio = (gzippedSize / encodedBodySize * 100).toFixed(1) + "%";
+  } else
+    compressionRatio = (encodedBodySize / decodedBodySize * 100).toFixed(1) + "%";
+
+  return nextHopProtocol + "\\n" +
+    deliveryType + "\\n\\n" +
+    encodedBodySize + "\\n" +
+    decodedBodySize + "\\n" +
+    compressionRatio + "\\n" +
+    gzippedSize + "\\n" +
+    gzippedRatio + "\\n\\n" +
+    duration.toFixed(1) + "ms\\n" +
+    (requestStart - secureConnectionStart).toFixed(1) + "ms\\n" +
+    (responseEnd - responseStart).toFixed(1) + "ms\\n" +
+    (domContentLoadedEventEnd - domContentLoadedEventStart).toFixed(1) + "ms\\n" +
+    (domComplete - domInteractive).toFixed(1) + "ms";
 })();`
     }]
-  }).then(results => {
-    let result = results[0].result;
-    let encodedBodySize = result[2];
-    let n = result[4];
-    let f = () => {
-      let maxLength = Math.max(result[1].length, result[3].length, n.length, result[7].length);
-      let u = document.body.children;
-      let i = 12;
-      while (
-        u[--i].textContent = (n = result[i]) ? n.padStart(maxLength, " ") : "",
-        i
-      );
-    }
-    result[2] = encodedBodySize + "";
-    n == "100%"
-      ? fetch (tabs[0].url)
-          .then(r => (new Response(r.body.pipeThrough(new CompressionStream("gzip")))).bytes())
-            .then(({ length }) => (
-              result[6] = (length / encodedBodySize * 100).toFixed(1) + "%",
-              result[5] = length + "",
-              f()
-            )).catch(() => 0)
-      : f();
-  }).catch(() => 0)
+  }).then(results =>
+    (results &&= results[0].result) &&
+    (document.body.lastChild.textContent = results)
+  ).catch(() => 0)
 );
