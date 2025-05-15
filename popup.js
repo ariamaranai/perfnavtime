@@ -30,25 +30,22 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, tabs =>
   } catch (e) {}
 
   if (encodedBodySize == decodedBodySize) {
-    compressionRatio = "100%";
-    try {
-      gzippedSize = (await ((new Response(r)).body.pipeThrough(new CompressionStream("gzip"))).bytes()).length;
-    } catch (e) {}
-    gzippedRatio = (gzippedSize / encodedBodySize * 100).toFixed(1) + " %";
-    gzippedSize += " bytes";
+    compressionRatio = "100 %";
+    gzippedRatio = ((gzippedSize = (await (new Response(r.body.pipeThrough(new CompressionStream("gzip")))).bytes()).length) / encodedBodySize * 100).toFixed(1) + " %";
+    gzippedSize = gzippedSize.toLocaleString("en-US") + " bytes";
   } else (
     compressionRatio = (encodedBodySize / decodedBodySize * 100).toFixed(1) + " %",
     contentEncoding = r.headers.get("content-encoding")
   )
 
   return nextHopProtocol + "\\n" +
-    deliveryType + "\\n\\n" +
-    encodedBodySize + " bytes\\n" +
-    decodedBodySize + " bytes\\n" +
+    deliveryType + "\\n" +
+    encodedBodySize.toLocaleString("en-US") + " bytes\\n" +
+    decodedBodySize.toLocaleString("en-US") + " bytes\\n" +
     contentEncoding + "\\n" +
     compressionRatio + "\\n" +
     gzippedSize + "\\n" +
-    gzippedRatio + "\\n\\n" +
+    gzippedRatio + "\\n" +
     duration.toFixed(1) + " ms\\n" +
     (requestStart - secureConnectionStart).toFixed(1) + " ms\\n" +
     (responseEnd - responseStart).toFixed(1) + " ms\\n" +
