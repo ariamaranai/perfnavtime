@@ -32,7 +32,7 @@
         compressionRatio = (encodedBodySize / decodedBodySize * 100).toFixed(1) + " %",
         contentEncoding = r.headers.get("content-encoding")
       );
-  } catch (e) {}
+  } catch {}
 
   return nextHopProtocol + "\n" +
     deliveryType + "\n" +

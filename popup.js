@@ -43,5 +43,5 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, async tabs => {
         ),
         chrome.tabs.reload()
       )
-  } catch (e) {}
+  } catch {}
 });
