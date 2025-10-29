@@ -30,13 +30,13 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, async tabs => {
               );
             }
             let gzippedSize = (await (new Response((new Blob([b])).stream().pipeThrough(new CompressionStream('gzip')))).arrayBuffer()).byteLength;
-            let localeBodySize = bodySize.toLocaleString("en-US") + " bytes\n";
+            let localeBodySize = bodySize.toLocaleString() + " bytes\n";
             node.textContent =
               "file\n\n" +
               localeBodySize +
               localeBodySize +
               "\n100%\n" +
-              gzippedSize.toLocaleString("en-US") + " bytes\n" +
+              gzippedSize.toLocaleString() + " bytes\n" +
               (gzippedSize / bodySize * 100).toFixed(1) + " %\n" +
               result;
           })
