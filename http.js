@@ -21,7 +21,7 @@
   let compressionRatio = "";
 
   try {
-    let r = await fetch (location.href);
+    let r = await fetch(location.href);
     encodedBodySize == decodedBodySize
       ? (
         compressionRatio = "100 %",
@@ -36,8 +36,8 @@
 
   return nextHopProtocol + "\n" +
     deliveryType + "\n" +
-    encodedBodySize.toLocaleString("en-US") + " bytes\n" +
-    decodedBodySize.toLocaleString("en-US") + " bytes\n" +
+    encodedBodySize.toLocaleString() + " bytes\n" +
+    decodedBodySize.toLocaleString() + " bytes\n" +
     contentEncoding + "\n" +
     compressionRatio + "\n" +
     gzippedSize + "\n" +
