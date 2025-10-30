@@ -1,12 +1,13 @@
 chrome.tabs.query({ active: !0, currentWindow: !0 }, async tabs => {
-  let { url, id } = tabs[0];
-  let target = { tabId: id };
-  let isHttp = url[0] == "h";
   try {
-    let { result } = (await chrome.userScripts.execute({
+    let tab = tabs[0];
+    let target = { tabId: tab.id };
+    let url = tab.url;
+    let isHttp = url[0] == "h";
+    let result = (await chrome.userScripts.execute({
       target,
       js: [{ file: isHttp ? "http.js" : "file.js" }]
-    }))[0];
+    }))[0].result;
     let node = document.body.lastChild;
     isHttp
       ? node.textContent = result
