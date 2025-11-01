@@ -15,33 +15,28 @@
     domInteractive
   } = performance.getEntriesByType("navigation")[0];
 
-  let contentEncoding = "";
-  let gzippedSize = "";
-  let gzippedRatio = "";
-  let compressionRatio = "";
-
   try {
     let r = await fetch(location.href);
-    encodedBodySize == decodedBodySize
-      ? (
-        compressionRatio = "100 %",
-        gzippedRatio = ((gzippedSize = (await (new Response(r.body.pipeThrough(new CompressionStream("gzip")))).arrayBuffer()).byteLength) / encodedBodySize * 100).toFixed(1) + " %",
-        gzippedSize = gzippedSize.toLocaleString("en-US") + " bytes"
-      )
-      : (
-        compressionRatio = (encodedBodySize / decodedBodySize * 100).toFixed(1) + " %",
-        contentEncoding = r.headers.get("content-encoding")
-      );
-  } catch {}
+    decodedBodySize =
+      decodedBodySize.toLocaleString() + " bytes\n" + (
+        encodedBodySize == decodedBodySize
+          ? (
+            (r = (await (new Response(r.body.pipeThrough(new CompressionStream("gzip")))).arrayBuffer()).byteLength) / encodedBodySize * 100,
+            "\n100 %\n" +
+            r.toLocaleString() + " bytes\n" +
+            (r / encodedBodySize * 100).toFixed(1) + " %\n"
+          )
+          : r.headers.get("content-encoding") + "\n" +
+            (encodedBodySize / decodedBodySize * 100).toFixed(1) + " %\n\n\n"
+        )
+  } catch {
+    decodedBodySize = "\n\n\n\n\n";
+  }
 
   return nextHopProtocol + "\n" +
     deliveryType + "\n" +
     encodedBodySize.toLocaleString() + " bytes\n" +
-    decodedBodySize.toLocaleString() + " bytes\n" +
-    contentEncoding + "\n" +
-    compressionRatio + "\n" +
-    gzippedSize + "\n" +
-    gzippedRatio + "\n" +
+    decodedBodySize +
     duration.toFixed(1) + " ms\n" +
     (requestStart - secureConnectionStart).toFixed(1) + " ms\n" +
     (responseEnd - responseStart).toFixed(1) + " ms\n" +
