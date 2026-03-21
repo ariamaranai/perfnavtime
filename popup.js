@@ -4,9 +4,10 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, async tabs => {
     let target = { tabId: tab.id };
     let url = tab.url;
     let isHttp = url[0] == "h";
-    let result = (await chrome.userScripts.execute({
+    let result = (await chrome.scripting.executeScript({
       target,
-      js: [{ file: isHttp ? "http.js" : "file.js" }]
+      world: "MAIN",
+      files: [isHttp ? "http.js" : "file.js"],
     }))[0].result;
     let node = document.body.lastChild;
     isHttp
