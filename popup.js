@@ -3,14 +3,13 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, async tabs => {
     let tab = tabs[0];
     let target = { tabId: tab.id };
     let url = tab.url;
-    let isHttp = url[0] == "h";
+    let isHttp = url.startsWith("http");
     let result = (await chrome.scripting.executeScript({
       target,
-      world: "MAIN",
       files: [isHttp ? "http.js" : "file.js"],
     }))[0].result;
     let node = document.body.lastChild;
-    isHttp
+    return isHttp
       ? node.textContent = result
       : (
         await chrome.debugger.attach(target, "1.3"),
@@ -22,15 +21,7 @@ chrome.tabs.query({ active: !0, currentWindow: !0 }, async tabs => {
             chrome.debugger.detach(target);
             let b = r.body;
             let bodySize = b.length;
-            if (r.base64Encoded) {
-              let bs = atob(b.replaceAll("-", "+").replaceAll("_", "/") + "===".slice((b.length + 3) % 4));
-              b = new Uint8Array(bodySize = bs.length);
-              let i = 0;
-              while (
-                b[i] = bs.charCodeAt(i),
-                ++i < bs.length
-              );
-            }
+            r.base64Encoded && (b = Uint8Array.fromBase64(b));
             let gzippedSize = (await (new Response((new Blob([b])).stream().pipeThrough(new CompressionStream('gzip')))).arrayBuffer()).byteLength;
             let localeBodySize = bodySize.toLocaleString() + " bytes\n";
             node.textContent =
